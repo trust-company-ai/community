@@ -2,7 +2,7 @@
 
 **Shared best practices and lessons learned for building AI infrastructure at trust companies.**
 
-Trust companies face a specific combination of constraints when adopting AI: fiduciary duties to clients, confidentiality of client and beneficiary data, regulatory oversight (OCC, state banking departments, or both), and small technology teams. Most firms are solving the same problems independently. This repository exists so they don't have to.
+Trust companies face a specific combination of constraints when adopting AI: fiduciary duties to clients, confidentiality of client and beneficiary data, confidentiality that may include solicitor-client / attorney-client privilege, regulatory oversight (federal, state or provincial banking and financial-services regulators, plus anti-money-laundering obligations), and small technology teams. Most firms are solving the same problems independently. This repository exists so they don't have to.
 
 ## What's here
 
@@ -38,7 +38,7 @@ These guide everything in this repository:
 
 ## Status
 
-Early stage. The first framework and a first [worked example](architecture/examples/) are in; lessons learned and templates are being collected. Open an [issue](../../issues) to ask a question, correct something, or volunteer a contribution.
+Early stage. The first framework and a first [worked example](architecture/examples/) — a Canadian trust company's platform in live use — are in; lessons learned and templates are being collected. Open an [issue](../../issues) to ask a question, correct something, or volunteer a contribution.
 
 ## License
 

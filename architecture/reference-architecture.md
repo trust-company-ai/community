@@ -31,7 +31,7 @@ flowchart TB
         end
 
         subgraph MODEL["Layer 3 — Model"]
-            LLM["Managed model endpoint<br/>zero retention · region-pinned · no training on firm data"]
+            LLM["Managed model endpoint<br/>zero retention · region-pinned (cross-region inference off, or a named exception) · no training on firm data"]
         end
 
         subgraph REVIEW["Layer 4 — Human review & workflow"]
@@ -72,6 +72,7 @@ flowchart TB
 - **Retrieval is entitlement-aware.** The index knows which user may see which document; the gateway asks on the user's behalf.
 - **Two exits from the gateway:** a labelled draft (Tier 1), or a draft that goes to a named decision-maker who writes the decision back to the system of record (Tier 2). Prohibited cases are stopped at the gateway.
 - **Logs are dotted lines** because they are a side effect of everything, not a step in the flow.
+- **Not every automated job goes through the model.** Regulatory outputs such as screening-list exports run as deterministic jobs with no model in the path (see the "Regulatory — no model" tier in Framework 01 and [Example 01](examples/01-serverless-cloud-platform/)).
 
 ## Deployment variants
 

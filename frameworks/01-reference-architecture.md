@@ -1,6 +1,6 @@
 # Framework 01 — Reference Architecture for AI at a Trust Company
 
-**Status:** Draft v0.1 · **Last updated:** 2026-09-05 · **Maintainer:** open
+**Status:** Draft v0.2 · **Last updated:** 2026-09-08 · **Maintainer:** open
 
 This document describes the layers a trust company's AI infrastructure needs, where client data is permitted to flow, and the controls that sit between layers. It is deliberately vendor-neutral: the same shape works whether you build on AWS, Azure, Google Cloud, or a vendor platform.
 
@@ -14,9 +14,9 @@ Generic "enterprise AI" architectures assume the main risk is a bad answer. For 
 
 | Risk | Why it matters more here |
 | --- | --- |
-| **Client data leaving the firm's control** | Fiduciary duty of confidentiality; GLBA safeguards; state privacy law. A leak is a breach of duty, not just a security incident. |
+| **Client data leaving the firm's control** | Fiduciary duty of confidentiality; where the firm's work is privileged, solicitor-client / attorney-client privilege; privacy and safeguards law (in the US, GLBA and state privacy law; in Canada, PIPEDA and provincial privacy law). A leak is a breach of duty, not just a security incident. |
 | **AI output being treated as a decision** | Discretionary fiduciary decisions (distributions, investment changes, beneficiary questions) must be made by a person who can be held accountable. |
-| **Inability to explain to an examiner** | Examiners apply model-risk expectations to quantitative models (interagency guidance revised April 2026, OCC Bulletin 2026-13). That guidance explicitly leaves generative and agentic AI *out of scope* — meaning there is no supervisory roadmap yet, and firms must be able to explain their AI controls on their own terms. |
+| **Inability to explain to an examiner** | Whether the examiner is the OCC, a state banking department or a provincial regulator, the question is the same: how did this output come to exist? In the US, examiners apply model-risk expectations to quantitative models (interagency guidance revised April 2026, OCC Bulletin 2026-13). That guidance explicitly leaves generative and agentic AI *out of scope* — meaning there is no supervisory roadmap yet, and firms must be able to explain their AI controls on their own terms. |
 | **Third-party dependence** | Most firms will buy, not build. Interagency third-party risk guidance (OCC Bulletin 2023-17, June 2023) applies to AI vendors like any other critical vendor. |
 | **Small teams** | A 3-person IT department cannot run a 12-layer MLOps stack. The architecture has to be operable by the people who actually work there. |
 
@@ -39,6 +39,7 @@ What the AI is allowed to see, and where that data physically is.
 - **Client data stays inside the firm's tenant.** Whether that is your own cloud account or a vendor's dedicated environment, it must be isolated from other customers and from the vendor's own training pipelines.
 - **Retrieval, not training.** The model reads documents at query time (retrieval-augmented generation). Client data is never used to fine-tune or train a model — the firm's own or a vendor's.
 - **Zero-retention inference.** Prompts and responses are not stored by the model provider beyond the request. Get this in the contract and verify it technically (e.g. provider's data-processing terms, logging configuration).
+- **Know your one cross-border path.** Even inside your own cloud account, a managed model service may have *cross-region inference* enabled, so prompts and responses can transit another region even though nothing is stored there. Check whether it is on for the model you call. If it is and you keep it, treat it as a named, documented exception — transient, encrypted, covered by the provider's data-processing agreement and zero-retention terms — with risk acceptance recorded and the path drawn in a distinct colour on your data-flow diagram. Do not tell clients or a regulator that "nothing crosses the border" unless you have verified it; that is the detail that will get tested.
 - **Classification before ingestion.** Documents are tagged (public / internal / client-confidential / restricted) before they reach any AI pipeline, and the pipeline enforces the tag.
 
 ### Layer 3 — Model & orchestration
@@ -53,6 +54,7 @@ Where AI output meets a decision.
 
 - **Drafting use cases** (meeting summaries, first-draft letters, document summaries): AI output is clearly labelled as a draft and edited by a professional before use.
 - **Decision-adjacent use cases** (distribution request analysis, investment policy review, beneficiary communications): AI output is one input; a named person records the decision and their reasoning in the system of record.
+- **Regulatory outputs** (screening lists, filings, reconciliations): where a hallucinated or dropped item is a regulatory problem rather than a quality problem, use deterministic extraction and rules with **no model at all**. Automation is still allowed — with a reconciliation check that suspends the run and reverts to the manual process on any variance.
 - **Prohibited use cases** are listed explicitly (see §4) and blocked at the orchestration layer, not just by policy.
 
 ### Layer 5 — Logging, monitoring & audit
@@ -73,7 +75,7 @@ The layers are only useful because of what sits between them.
 | --- | --- |
 | User → Orchestration | Authentication, session logging, acceptable-use acknowledgement |
 | Orchestration → Data | Entitlement check on every retrieval; classification enforcement; PII/PHI detection on outbound prompts |
-| Orchestration → Model | Zero-retention endpoint; region pinning; prompt-injection filtering; output content filters |
+| Orchestration → Model | Zero-retention endpoint; region pinning, with cross-region inference either disabled or recorded as a named exception; prompt-injection filtering; output content filters |
 | Model → User | "AI-generated draft" labelling; citation of retrieved sources; confidence / abstention where the model has nothing to cite |
 | Everything → Logs | Immutable, append-only, in the firm's tenant |
 
@@ -88,9 +90,10 @@ Firms have found it useful to classify use cases into tiers and gate the archite
 | **Tier 0 — Internal, no client data** | Drafting internal policies, summarising public regulatory guidance, IT helpdesk | Layers 1, 3, 5 |
 | **Tier 1 — Client data, drafting only** | Summarising a trust instrument for the officer, drafting a client letter, meeting notes | All five layers; output labelled as draft |
 | **Tier 2 — Client data, decision-adjacent** | Analysing a discretionary distribution request against the instrument and history, flagging investment-policy drift | All five layers; named decision-maker; reasoning recorded; periodic model-risk review |
+| **Regulatory — no model** | AML / sanctions name exports, regulatory filings, reconciliations | Deterministic extraction and rules only; reconciliation check with automatic suspension on variance; human approval before anything leaves the firm |
 | **Prohibited (for now)** | Autonomous approval of distributions; unattended client communication; investment execution | Blocked at orchestration layer |
 
-Tiers move over time. A firm's first deployment should be Tier 0 or Tier 1.
+Tiers move over time. A firm's first deployment should be Tier 0 or Tier 1. The "Regulatory — no model" tier is not a lower tier: it is a decision that the model is not allowed there, which the first contributing firm found as important as knowing where the model helps (see [Example 01](../architecture/examples/01-serverless-cloud-platform/)).
 
 ---
 
@@ -115,6 +118,8 @@ A vendor that cannot answer these six questions clearly is not ready for a trust
 - Data classification scheme — planned as Framework 02
 - Internal due-diligence checklist for evaluating AI platforms — planned for `templates/`
 - Incident response for AI-specific failures (hallucinated facts in client communications, prompt injection via uploaded documents)
+- Governance workstreams around a deployment (privacy, cybersecurity, third-party risk, risk acceptance, data flows, incident response, business continuity, regulator review) — a first contributing firm has offered its genericised materials
+- A one-page "where data sits and where it moves" data-flow template for supervisory review
 
 Contributions welcome on any of these. See [CONTRIBUTING.md](../CONTRIBUTING.md).
 
@@ -126,5 +131,6 @@ Contributions welcome on any of these. See [CONTRIBUTING.md](../CONTRIBUTING.md)
 - OCC Bulletin 2023-17, *Third-Party Relationships: Interagency Guidance on Risk Management* (June 2023)
 - 12 CFR Part 9, *Fiduciary Activities of National Banks*
 - Gramm-Leach-Bliley Act, Title V (privacy and safeguards)
+- Personal Information Protection and Electronic Documents Act (PIPEDA), Canada, and provincial privacy legislation where applicable
 
 *Regulatory references are provided for orientation, dated as of the "last updated" date above, and are not legal advice. Verify against current guidance and your own counsel.*

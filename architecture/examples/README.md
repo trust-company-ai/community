@@ -4,6 +4,6 @@ Real architectures contributed by trust companies, with identifying details remo
 
 | # | Example | Summary |
 | --- | --- | --- |
-| 01 | [Serverless AI Integration Platform (PoC)](01-serverless-cloud-poc/) | Single in-country cloud region; read-only source systems; LLM matter search with source citations; scheduled report drafts; no-LLM AML name export with reconciliation and human-approval gates. |
+| 01 | [AI Integration Platform (in production)](01-serverless-cloud-platform/) | A Canadian trust company's Board-governed platform, in live use. Single in-country cloud region with one named cross-region exception; read-only source systems; source-cited estate-file review and risk identification; scheduled quarterly trust-report drafts behind a human review gate; no-LLM AML name export with reconciliation and human-approval gates. |
 
 To contribute one, see [Contributing](../../CONTRIBUTING.md) — a PDF or picture of your diagram is enough; we'll redraw it in Mermaid.
