@@ -2,6 +2,14 @@
 
 Companion to [Framework 01](../frameworks/01-reference-architecture.md). The diagram is Mermaid; GitHub renders it automatically. Edit the text to change the diagram.
 
+## Community reference pattern (as shown on trustcompanyai.org)
+
+The same pattern, drawn as the diagram used on the plain-English site. It summarises what the contributed material supports so far and will change as more input arrives.
+
+![Community reference pattern — architecture](community-reference-pattern.svg)
+
+![Community reference pattern — use-case tiers](community-reference-pattern-tiers.svg)
+
 ## Logical view
 
 ```mermaid
