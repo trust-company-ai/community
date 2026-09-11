@@ -20,16 +20,6 @@ A plain-English companion website is in preparation. This repository is the tech
 1. **[Reference Architecture for AI at a Trust Company](frameworks/01-reference-architecture.md)** — the core framework: the layers every deployment needs, where client data is allowed to flow, and the controls that sit between them.
 2. **[Contributing](CONTRIBUTING.md)** — how to add a lesson learned, propose a change, or submit a template. No git experience required.
 
-## Principles
-
-These guide everything in this repository:
-
-- **Fiduciary first.** An AI system that helps the firm but exposes a client is a failure, not a trade-off.
-- **Client data never trains any model outside the firm.** Contractually, technically, and verifiably.
-- **Humans decide; AI drafts.** AI output is an input to a professional's judgment, never the decision itself, for anything affecting a client or beneficiary.
-- **Explainable enough for an examiner.** If you can't describe to a regulator what the system does, what data it saw, and who reviewed the output, it isn't ready.
-- **Share the pattern, not the secret.** Contributors share architecture and process. Nobody is asked to share client data, proprietary code, or commercially sensitive detail.
-
 ## Who this is for
 
 - Trust officers and fiduciary leaders evaluating AI
